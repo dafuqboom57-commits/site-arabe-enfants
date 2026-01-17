@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Apprendre l’arabe pour enfants</title>
+<style>
+body {
+  background-color: #fff3c4;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+h1 { color: #ff6600; }
+.menu button {
+  margin: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  background: #2196F3;
+  color: white;
+  cursor: pointer;
+}
+.section { display: none; margin-top: 20px; }
+.card {
+  background: white;
+  padding: 20px;
+  margin: 15px auto;
+  width: 320px;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s;
+}
+.card:hover { transform: scale(1.05); }
+.lettre { font-size: 70px; display: block; margin: 10px 0; }
+.points {
+  background: #4CAF50;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  width: 200px;
+  margin: 10px auto;
+  font-size: 18px;
+  transition: transform 0.3s;
+}
+button.action {
+  background: #ff6600;
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+button.action:hover { transform: scale(1.1); }
+img.lettre-img {
+  width: 100px;
+  height: 100px;
+  margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<h1>🌟 Apprendre l’arabe en s’amusant 🌟</h1>
+<p>Alphabet • Mots • Sons • Jeux</p>
+
+<div class="points" id="scoreBox">⭐ Points : <span id="score">0</span></div>
+
+<div class="menu">
+  <button onclick="show('alphabet')">🔤 Alphabet</button>
+  <button onclick="show('mots')">🖼️ Mots</button>
+  <button onclick="show('jeux')">🎮 Jeux</button>
+</div>
+
+<!-- ALPHABET -->
+<div id="alphabet" class="section">
+  <div class="card">
+    <div class="lettre" id="lettre">ا</div>
+    <img class="lettre-img" id="lettreImg" src="" alt="">
+    <p id="nom">Alif</p>
+    <button class="action" onclick="parler()">🔊 Écouter</button>
+    <button class="action" onclick="suivant()">➡️ Suivant</button>
+  </div>
+</div>
+
+<!-- MOTS -->
+<div id="mots" class="section">
+  <div class="card" id="motCard"></div>
+</div>
+
+<!-- JEUX -->
+<div id="jeux" class="section">
+  <!-- Mini Quiz Lettre -->
+  <div class="card" style="background-color:#ffefc4;">
+    <p>🎯 Quel est le nom de cette lettre ?</p>
+    <div class="lettre" id="quizLettre">ب</div>
+    <img class="lettre-img" id="quizImg" src="" alt="">
+    <div id="options"></div>
+  </div>
+
+  <!-- Jeu Correspondance Lettre → Mot -->
+  <div class="card" style="background-color:#c4ffef;">
+    <p>🧩 Associe la lettre avec le mot correct :</p>
+    <div id="matchLettre"></div>
+    <div id="matchOptions"></div>
+  </div>
+</div>
+
+<!-- Son gagnant -->
+<audio id="winSound" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
+
+<script>
+// --- Données lettres avec images ---
+const lettres = 
+ 
+  ['ا','Alif','https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Alif_%28Arabic_letter%29.svg/120px-Alif_%28Arabic_letter%29.svg.png'],
+  ['ب','Ba','https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Ba_%28Arabic_letter%29.svg/120px-Ba_%28Arabic_letter%29.svg.png']
+  ['ت','Ta','https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Ta_%28Arabic_letter%29.svg/120px-Ta_%28Arabic_letter%29.svg.png'],
+  ['ث','Tha','https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Tha_%28Arabic_letter%29.svg/120px-Tha_%28Arabic_letter%29.svg.png'],
+  ['ج','Jim','https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Jim_%28Arabic_letter%29.svg/120px-Jim_%28Arabic_letter%29.svg.png'],
+  ['ح','Ha','https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ha_%28Arabic_letter%29.svg/120px-Ha_%28Arabic_letter%29.svg.png'],
+  ['خ','Kha','https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Kha_%28Arabic_letter%29.svg/120px-Kha_%28Arabic_letter%29.svg.png'],
+  ['د','Dal','https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Dal_%28Arabic_letter%29.svg/120px-Dal_%28Arabic_letter%29.svg.png'],
+  ['ذ','Dhal','https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Dhal_%28Arabic_letter%29.svg/120px-Dhal_%28Arabic_letter%29.svg.png'],
+  ['ر','Ra','https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ra_%28Arabic_letter%29.svg/120px-Ra_%28Arabic_letter%29.svg.png'],
+  ['ز','Zay','https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Zay_%28Arabic_letter%29.svg/120px-Zay_%28Arabic_letter%29.svg.png'],
+  ['س','Sin','https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Sin_%28Arabic_letter%29.svg/120px-Sin_%28Arabic_letter%29.svg.png'],
+  ['ش','Shin','https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Shin_%28Arabic_letter%29.svg/120px-Shin_%28Arabic_letter%29.svg.png'],
+  ['ص','Sad','https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Sad_%28Arabic_letter%29.svg/120px-Sad_%28Arabic_letter%29.svg.png'],
+  ['ض','Dad','https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Dad_%28Arabic_letter%29.svg/120px-Dad_%28Arabic_letter%29.svg.png'],
+  ['ط','Ta','https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Ta%28Arabic_letter%29.svg/120px-Ta%28Arabic_letter%29.svg.png'],
+  ['ظ','Za','https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Za_%28Arabic_letter%29.svg/120px-Za_%28Arabic_letter%29.svg.png'],
+  ['ع','Ayn','https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Ayn_%28Arabic_letter%29.svg/120px-Ayn_%28Arabic_letter%29.svg.png'],
+  ['غ','Ghayn','https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Ghayn_%28Arabic_letter%29.svg/120px-Ghayn_%28Arabic_letter%29.svg.png'],
+  ['ف','Fa','https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Fa_%28Arabic_letter%29.svg/120px-Fa_%28Arabic_letter%29.svg.png'],
+  ['ق','Qaf','https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Qaf_%28Arabic_letter%29.svg/120px-Qaf_%28Arabic_letter%29.svg.png'],
+  ['ك','Kaf','https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Kaf_%28Arabic_letter%29.svg/120px-Kaf_%28Arabic_letter%29.svg.png'],
+  ['ل','Lam','https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Lam_%28Arabic_letter%29.svg/120px-Lam_%28Arabic_letter%29.svg.png'],
+  ['م','Mim','https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Mim_%28Arabic_letter%29.svg/120px-Mim_%28Arabic_letter%29.svg.png'],
+  ['ن','Nun','https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Nun_%28Arabic_letter%29.svg/120px-Nun_%28Arabic_letter%29.svg.png'],
+  ['ه','Ha','https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Ha_Arabic_letter.svg/120px-Ha_Arabic_letter.svg.png'],
+  ['و','Waw','https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Waw_%28Arabic_letter%29.svg/120px-Waw_%28Arabic_letter%29.svg.png'],
+  ['ي','Ya','https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ya_%28Arabic_letter%29.svg/120px-Ya_%28Arabic_letter%29.svg.png']
+;
+
+const mots = [
+  ['ا','أرنب'],['ب','بيت'],['ت','تفاحة'],['ج','جمل'],['س','سمكة'],['م','موز'],
+  ['ن','نمر'],['ر','رجل'],['ق','قلم'],['ك','كتاب']
+];
+
+let index = 0;
+let score = 0;
+
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.style.display='none');
+  document.getElementById(id).style.display = 'block';
+  if(id==='jeux'){ initQuiz(); initMatch(); }
+  if(id==='mots'){ afficherMots(); }
+}
+
+// --- Alphabet ---
+function suivant() {
+  index = (index + 1) % lettres.length;
+  updateAlphabet();
+}
+
+function updateAlphabet(){
+  document.getElementById('lettre').innerText = lettres[index][0];
+  document.getElementById('nom').innerText = lettres[index][1];
+  document.getElementById('lettreImg').src = lettres[index][2];
+}
+
+function parler() {
+  const utter = new SpeechSynthesisUtterance(lettres[index][1]);
+  utter.lang = 'ar-SA';
+  speechSynthesis.speak(utter);
+}
+
+// --- Score avec animation et son ---
+function updateScore(points){
+  score += points;
+  const scoreBox = document.getElementById('scoreBox');
+  document.getElementById('score').innerText = score;
+  scoreBox.style.transform = 'scale(1.5)';
+  document.getElementById('winSound').play();
+  setTimeout(()=>{ scoreBox.style.transform = 'scale(1)'; },300);
+}
+
+// --- Afficher mots ---
+function afficherMots(){
+  const motCard = document.getElementById('motCard');
+  motCard.innerHTML = '';
+  mots.forEach(m=>{
+    const p = document.createElement('p');
+    p.innerHTML = `<span class="lettre"> ${m[0]} </span> – <b>${m[1]}</b>`;
+    motCard.appendChild(p);
+  });
+}
+
+// --- Quiz ---
+function initQuiz(){
+  const quizIndex = Math.floor(Math.random() * lettres.length);
+  const quizLettre = lettres[quizIndex];
+  document.getElementById('quizLettre').innerText = quizLettre[0];
+  document.getElementById('quizImg').src = quizLettre[2];
+
+  const optionsDiv = document.getElementById('options');
+  optionsDiv.innerHTML = '';
+
+  let opts = [quizLettre[1]];
+  while(opts.length<3){
+    const randOpt = lettres[Math.floor(Math.random()*lettres.length)][1];
+    if(!opts.includes(randOpt)) opts.push(randOpt);
+  }
+  opts = opts.sort(()=>Math.random()-0.5);
+
+  opts.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className='action';
+    btn.innerText=o;
+    btn.onclick = ()=>{
+      if(o===quizLettre[1]){
+        updateScore(10);
+        alert('Correct ! ⭐ +10 points');
+      } else alert('Essaie encore 😊');
+      initQuiz();
+    };
+    optionsDiv.appendChild(btn);
+  });
+}
+
+// --- Jeu correspondance lettre -> mot ---
+function initMatch(){
+  const randomIndex = Math.floor(Math.random() * mots.length);
+  const lettre = mots[randomIndex][0];
+  const mot = mots[randomIndex][1];
+
+  document.getElementById('matchLettre').innerText = 'Lettre : '+lettre;
+  const optionsDiv = document.getElementById('matchOptions');
+  optionsDiv.innerHTML='';
+
+  let options = [mot];
+  while(options.length<3){
+    const randMot = mots[Math.floor(Math.random()*mots.length)][1];
+    if(!options.includes(randMot)) options.push(randMot);
+  }
+  options = options.sort(()=>Math.random()-0.5);
+
+  options.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className='action';
+    btn.innerText=o;
+    btn.onclick = ()=>{
+      if(o===mot){
+        updateScore(10);
+        alert('Bravo ! ⭐ +10 points');
+      } else alert('Oups, essaie encore 😊');
+      initMatch();
+    };
+    optionsDiv.appendChild(btn);
+  });
+}
+
+// --- Initialisation ---
+updateAlphabet();
+show('alphabet');
+
+</script>
+
+</body>
+</html>
+
